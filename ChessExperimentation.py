@@ -85,7 +85,7 @@ def PGNParser(aPGN, moveNum):
 
 def PiecesOnBoard(aPGN, moveNum):
     """return list of pieces on the board after move number moveNum"""
-    game_data_from_PGN = PGNParser(PGN, moveNum)
+    game_data_from_PGN = PGNParser(aPGN, moveNum)
     board = game_data_from_PGN.end().board()
     pieceDictionary = board.piece_map()
     bishops_and_knights = {'B': 0, 'b': 0, 'N': 0, 'n': 0} #white bishops, black bishops, white knights, black knights
@@ -96,21 +96,27 @@ def PiecesOnBoard(aPGN, moveNum):
             bishops_and_knights[piece] += 1
         except:
             pass
+        
     return bishops_and_knights
        
 
+def openOrClosed():
+    """returns extent to which a game is open or closed at a certain time - needs to be built"""
+    return 0
+
+
     
 if __name__ == "__main__":
-    moveNumber = 100
+    moveNumber = 15
     randomID = getRandomGameID()
     
-    PGN = getPGN(randomID)
-    game_data_from_PGN = PGNParser(PGN, moveNumber)
+    entirePGN = getPGN(randomID)
+    game_data_from_PGN = PGNParser(entirePGN, moveNumber)
     board = game_data_from_PGN.end().board()
     opening, result = getOpeningAndResult(getJSONFromGameID(randomID))
     print(board) 
     
-    bishops_and_knights = PiecesOnBoard(board, moveNumber) #still need to incorporate move number
+    bishops_and_knights = PiecesOnBoard(entirePGN , moveNumber) 
     print(bishops_and_knights)
 
     
