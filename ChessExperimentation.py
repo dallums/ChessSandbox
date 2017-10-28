@@ -58,14 +58,21 @@ def getPGN(gameID):
     return PGN
 
 
-def PGNParser(aPGN):
-    """parses the returned object from the chess.rest API"""
+def PGNParser(aPGN, moveNum):
+    """parses the returned object from the chess.rest API after move numvber moveNum"""
     dummyFile = open("dummyPGN.txt", "w")
+    moveNum += 1
+    moveNum = str(moveNum)+'.'
     
     badIndex = aPGN.index('\r\n\r\n')+4
     goodBeginning = aPGN[:badIndex]
     goodEnding = aPGN[badIndex:].replace('\r\n', ' ') #there was an issue with not reading all the moves due to line breaks
-    aPGN = goodBeginning+goodEnding
+    
+    #if moveNum exceeds max number of moves, just return the whole game
+    try:
+        aPGN = goodBeginning+goodEnding[:goodEnding.index(moveNum)]
+    except:
+        aPGN = goodBeginning+goodEnding
     
     dummyFile.write(aPGN)
     dummyFile.close()
@@ -78,7 +85,7 @@ def PGNParser(aPGN):
 
 def PiecesOnBoard(aPGN, moveNum):
     """return list of pieces on the board after move number moveNum"""
-    game_data_from_PGN = PGNParser(PGN)
+    game_data_from_PGN = PGNParser(PGN, moveNum)
     board = game_data_from_PGN.end().board()
     pieceDictionary = board.piece_map()
     bishops_and_knights = {'B': 0, 'b': 0, 'N': 0, 'n': 0} #white bishops, black bishops, white knights, black knights
@@ -94,15 +101,16 @@ def PiecesOnBoard(aPGN, moveNum):
 
     
 if __name__ == "__main__":
+    moveNumber = 100
     randomID = getRandomGameID()
     
     PGN = getPGN(randomID)
-    game_data_from_PGN = PGNParser(PGN)
+    game_data_from_PGN = PGNParser(PGN, moveNumber)
     board = game_data_from_PGN.end().board()
     opening, result = getOpeningAndResult(getJSONFromGameID(randomID))
     print(board) 
     
-    bishops_and_knights = PiecesOnBoard(board, 10) #still need to incorporate move number
+    bishops_and_knights = PiecesOnBoard(board, moveNumber) #still need to incorporate move number
     print(bishops_and_knights)
 
     
