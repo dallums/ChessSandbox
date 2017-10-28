@@ -12,7 +12,7 @@ from pprint import pprint
 
 
 
-GlobalSettings = {'SecretKey': ###,\
+GlobalSettings = {'SecretKey': 'PctfMoGWE5cw_idHjpJymgeF',\
                   'GameFromID': 'http://chess.rest/gameref/game',\
                   'GameFromPGN': 'http://chess.rest/gameref/pgn.json',\
                   'RandomGame': 'http://chess.rest/gameref/random.json'}
@@ -30,18 +30,16 @@ def getRandomGameID():
     return responseJSON['contents']['games'][0]['id']
 
 
-def getJSONFromRandomID():
+def getJSONFromGameID(gameID):
     """Using a random game ID, returns the JSON response of the response object"""
-    randomID = getRandomGameID()
-    r = requests.get(GlobalSettings['GameFromID'], params={'id':randomID}, headers = Headers)
+    r = requests.get(GlobalSettings['GameFromID'], params={'id':gameID}, headers = Headers)
     d = json.loads(r.text)
     return d
 
 
-def getJSONFromRandomPGN():
+def getJSONFromPGN(gameID):
     """Returns response object in JSON format from a PGN request using a random ID"""
-    randomID = getRandomGameID()
-    r = requests.get(GlobalSettings['GameFromPGN'], params={'id':randomID}, headers = Headers)
+    r = requests.get(GlobalSettings['GameFromPGN'], params={'id':gameID}, headers = Headers)
     d = json.loads(r.text)
     return d
 
@@ -53,9 +51,9 @@ def getOpeningAndResult(JSONfromid):
     return opening, result
     
 
-def getRandomPGN():
+def getPGN(gameID):
     """Gets a random PGN"""
-    d = getJSONFromRandomPGN()
+    d = getJSONFromPGN(gameID)
     PGN = d['contents']['pgn']
     return PGN
 
@@ -66,7 +64,7 @@ def PGNParser(aPGN):
     
     badIndex = aPGN.index('\r\n\r\n')+4
     goodBeginning = aPGN[:badIndex]
-    goodEnding = aPGN[badIndex:].replace('\r\n', '') #there was an issue with not reading all the moves due to line breaks
+    goodEnding = aPGN[badIndex:].replace('\r\n', ' ') #there was an issue with not reading all the moves due to line breaks
     aPGN = goodBeginning+goodEnding
     
     dummyFile.write(aPGN)
@@ -78,8 +76,10 @@ def PGNParser(aPGN):
     return gameFromPGN
 
 
-def PiecesOnBoard(board, moveNum):
+def PiecesOnBoard(aPGN, moveNum):
     """return list of pieces on the board after move number moveNum"""
+    game_data_from_PGN = PGNParser(PGN)
+    board = game_data_from_PGN.end().board()
     pieceDictionary = board.piece_map()
     bishops_and_knights = {'B': 0, 'b': 0, 'N': 0, 'n': 0} #white bishops, black bishops, white knights, black knights
     
@@ -95,10 +95,14 @@ def PiecesOnBoard(board, moveNum):
     
 if __name__ == "__main__":
     randomID = getRandomGameID()
-    randomPGN = getRandomPGN()
-    game_data_from_PGN = PGNParser(randomPGN)
+    
+    PGN = getPGN(randomID)
+    game_data_from_PGN = PGNParser(PGN)
     board = game_data_from_PGN.end().board()
+    opening, result = getOpeningAndResult(getJSONFromGameID(randomID))
     print(board) 
     
     bishops_and_knights = PiecesOnBoard(board, 10) #still need to incorporate move number
+    print(bishops_and_knights)
+
     
