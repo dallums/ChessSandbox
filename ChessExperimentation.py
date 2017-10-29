@@ -97,17 +97,28 @@ def PiecesOnBoard(aPGN, moveNum):
         except:
             pass
         
-    return bishops_and_knights
+    return bishops_and_knights, pieceDictionary
        
 
-def openOrClosed():
+def openOrClosed(pieces):
     """returns extent to which a game is open or closed at a certain time - needs to be built"""
+#    Taken from cgss on chess.SE:
+#    Number of pawns(a position with no pawns is apparently wide open).
+#    Number of pawn moves(assuming a position with three pawns each,there's a big difference if they are on f2,g2,f7 and f7,g7,h7 respectively and if they are on c4,d5,e4 and c5,d6,e5.
+#    As you see in 2 you may give an extra weight for pawn moves in the center. Generally it will be a good idea to give extra weight for anything open in the center. This will be more clear in 4.
+#    Number of open and semi-open files. The ones in the center again should have an extra weight.
+#    Open diagonals. Note that diagonals with one or more isolani should be counted almost as opens(As an example think about the Indian's bishop targeting d4 and b2 when the c pawn is not on c3). And you should of course take into consideration the length of the diagonal.
+#          
+#    Another idea from chess.SE from Philip Roe:
+#    Look at every piece on the board, and count the number of moves that it would have if there was nothing else on the board. Add this up for all pieces on both sides and call it $N_{empty}$.
+#    Now count the number of moves/captures that each piece actually has and add these. Call this total $N_{actual}$. The ratio $N_{actual}/N_{empty}$ is a measure of the open-ness of the position.
+                                                                                    
     return 0
 
 
     
 if __name__ == "__main__":
-    moveNumber = 15
+    moveNumber = 1
     randomID = getRandomGameID()
     
     entirePGN = getPGN(randomID)
@@ -116,7 +127,9 @@ if __name__ == "__main__":
     opening, result = getOpeningAndResult(getJSONFromGameID(randomID))
     print(board) 
     
-    bishops_and_knights = PiecesOnBoard(entirePGN , moveNumber) 
+    bishops_and_knights, pieces_on_board = PiecesOnBoard(entirePGN , moveNumber) 
     print(bishops_and_knights)
+    
+    howOpen = openOrClosed(pieces_on_board)
 
     
