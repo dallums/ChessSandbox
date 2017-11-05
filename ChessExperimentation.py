@@ -12,7 +12,7 @@ from pprint import pprint
 
 
 
-GlobalSettings = {'SecretKey': 'PctfMoGWE5cw_idHjpJymgeF',\
+GlobalSettings = {'SecretKey': '',\
                   'GameFromID': 'http://chess.rest/gameref/game',\
                   'GameFromPGN': 'http://chess.rest/gameref/pgn.json',\
                   'RandomGame': 'http://chess.rest/gameref/random.json'}
